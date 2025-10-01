@@ -46,5 +46,10 @@
         //Delivery info
         public virtual Delivery Delivery { get; set; }
 
+        //multiple offers can be applied to a single order
+        public virtual ICollection<OrderOffer> OrderOffers { get; set; }
+
     }
+
+   
 }

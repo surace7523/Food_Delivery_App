@@ -5,6 +5,8 @@
         public int PaymentTypeMasterId { get; set; }
         public string TypeName { get; set; }  //Credit Card, PayPal, etc.
         public string? Description { get; set; }
+
+        public bool IsActive { get; set; }
         //Navigation
         public virtual ICollection<Payment> Payments { get; set; }
 

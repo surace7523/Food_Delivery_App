@@ -8,6 +8,7 @@
         public string StatusName { get; set; }  //Pending, Completed, Failed, Refunded
         public string? Description { get; set; }
 
+        public bool IsActive { get; set; }
         //Navigation
         public virtual ICollection<Payment> Payments { get; set; }
     }

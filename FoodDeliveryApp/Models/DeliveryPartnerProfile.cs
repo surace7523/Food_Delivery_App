@@ -1,4 +1,5 @@
-﻿using FoodDeliveryApp.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using FoodDeliveryApp.Models;
 
 namespace FoodDeliveryApp.Models
 {
@@ -17,6 +18,17 @@ namespace FoodDeliveryApp.Models
 
         //Navigation to deliveries
         public virtual ICollection<Delivery> Deliveries { get; set; }
+
+
+        //This will dynamically count te number of completed deliveries without storing in db.
+        public int TotalDeliveries => Deliveries?.Count ?? 0;
+
+
+        //navigation for reviews given to the delivery partner
+        public virtual ICollection<Review> Reviews { get; set; }
+
+        [NotMapped]
+        public decimal AverageRating => Reviews != null && Reviews.Count > 0 ? (decimal)Reviews.Average(r => r.Rating) : 0;
     }
 }
 

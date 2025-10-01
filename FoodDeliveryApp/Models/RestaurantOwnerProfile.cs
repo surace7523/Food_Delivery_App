@@ -13,12 +13,9 @@
         public string BusinessLiscenceNumber { get; set; }
         public string BusinessRegistrationNumber { get; set; }
         public bool IsVerified { get; set; }  //admin will verify if u are a legit business
+        public string? AdminRemarks { get; set; } //nullable field for admin to leave remarks during verification
 
 
-        //possible bank details for payments
-        public string? AccountHolderName { get; set; } //making it nullable
-        public string BankName { get; set; }
-        public string AccountNumber { get; set; }
-        public string IFSCCode { get; set; }
+
     }
 }

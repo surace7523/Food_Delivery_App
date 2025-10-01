@@ -7,6 +7,8 @@
         public string StatusName { get; set; }  //placed confirmed confirming 
         public string? Description { get; set; }
 
+        public bool IsActive { get; set; }
+
         //Navigation
         public virtual ICollection<Order> Orders { get; set; }
     }

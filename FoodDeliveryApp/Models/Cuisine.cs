@@ -17,5 +17,6 @@
         //navigation one cousine can have multiple restaurant
 
         public virtual ICollection<RestaurantCuisine> RestaurantCuisines { get; set; }
+        public bool IsActive { get; internal set; }
     }
 }

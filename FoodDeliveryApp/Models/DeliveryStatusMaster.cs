@@ -4,6 +4,8 @@
     {
         public int DeliveryStatusMasterId { get; set; }
         public string StatusName { get; set; }  //out for delivery, delivered, delayed
+
+        public bool IsActive { get; set; }
         public string? Description { get; set; }
         //Navigation
         public virtual ICollection<Delivery> Deliveries { get; set; }

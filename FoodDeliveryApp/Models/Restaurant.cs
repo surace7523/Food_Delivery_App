@@ -35,6 +35,27 @@ namespace FoodDeliveryApp.Models
         public virtual ICollection<MenuCategory> MenuCategories { get; set; }
 
         public virtual ICollection<Order> Orders { get; set; }
-    
+        public virtual ICollection<RestaurantClosure> Closures { get; set; }
+
+        [NotMapped]
+        public bool IsOpen
+        {
+            get
+            {
+                var now = DateTime.Now;
+
+                // 🔹 Check closures first
+                if (Closures != null && Closures.Any(c =>
+                    now.Date >= c.StartDate.Date && now.Date <= c.EndDate.Date))
+                {
+                    return false; // closed due to closure record
+                }
+
+                // 🔹 Check normal hours
+                var currentTime = now.TimeOfDay;
+                return currentTime >= OpeningTime && currentTime <= ClosingTime;
+            }
+        }
+
     }
 }
