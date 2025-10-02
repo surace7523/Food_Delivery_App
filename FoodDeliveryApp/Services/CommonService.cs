@@ -12,11 +12,11 @@ namespace FoodDeliveryApp.Services
         }
         public async Task<bool> IsEmailDuplicateAsync(string email)
         {
-            return await _context.Users.AnyAsync(u => u.Email == email);
+            return await _context.Users.AnyAsync(u => u.Email == email);  //Returns true if a user with the given email exists
         }
         public async Task<bool> IsPhoneDuplicateAsync(string phone)
         {
-            return await _context.Users.AnyAsync(u => u.PhoneNumber == phone);
+            return await _context.Users.AnyAsync(u => u.PhoneNumber == phone);  //Returns true if a user with the given phone number exists
         }
     }
 }

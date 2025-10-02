@@ -13,9 +13,16 @@ namespace FoodDeliveryApp.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
 
+        public bool IsEmailVerified { get; set; }
+        public bool  IsPhoneNumberVerified { get; set; }
+        public bool IsTwoFactorEnabled { get; set; }
+        public bool IsActive { get; set; }
+
         //role information
         public int RoleMasterId { get; set; }
         public virtual RoleMaster RoleMaster { get; set; }
+
+
 
         //Audit information
 

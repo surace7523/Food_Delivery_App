@@ -1,5 +1,5 @@
 ﻿using FoodDeliveryApp.ViewModels.Common;
-using FoodDeliveryApp.ViewModels.Customer;
+using FoodDeliveryApp.ViewModels.Customers;
 using FoodDeliveryApp.Models;
 namespace FoodDeliveryApp.Services
 {

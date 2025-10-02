@@ -1,4 +1,5 @@
 using FoodDeliveryApp.Data;
+using FoodDeliveryApp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -16,6 +17,12 @@ internal class Program
 
         //clear the default logging providers
         builder.Logging.ClearProviders();
+
+
+        //emial service 
+        builder.Services.AddScoped<ICustomerService, CustomerService>();
+        builder.Services.AddScoped<IEmailService, EmailService>();
+
 
         //configure the host ti use serilog as the logging provider
 

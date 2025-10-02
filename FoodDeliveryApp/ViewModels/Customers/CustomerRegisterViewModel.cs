@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FoodDeliveryApp.ViewModels.Customer
+namespace FoodDeliveryApp.ViewModels.Customers
 {
     public class CustomerRegisterViewModel
     {
