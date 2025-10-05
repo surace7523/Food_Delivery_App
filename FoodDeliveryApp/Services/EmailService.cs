@@ -1,11 +1,9 @@
-﻿namespace FoodDeliveryApp.Services
+﻿using System.Threading.Tasks;
+
+namespace FoodDeliveryApp.Services
 {
-    public class EmailService : IEmailService
+    public class EmailService : I
     {
-        public Task SendWelcomeEmailAsync(string email, string firstName)
-        {
-            // Implementation e.g. SMTP, SendGrid, etc.
-            return Task.CompletedTask;
-        }
+
     }
 }

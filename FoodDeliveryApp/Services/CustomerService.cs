@@ -179,9 +179,35 @@ namespace FoodDeliveryApp.Services
                 throw;
             }
         }
-        public Task<bool> AddAddressAsync(int userId, AddressViewModel model)
+        public async Task<bool> AddAddressAsync(int userId, AddressViewModel model)
         {
-            throw new NotImplementedException();
+            try 
+            {
+                //map the view model to the muser address entity    
+                var userAddress = new UserAddress
+                {
+                    UserId = userId,
+                    AddressLine1 = model.AddressLine,
+                    AddressLine2 = model.AddressLine,
+                    City = model.City,
+                    State = model.State,
+                    ZipCode = model.ZipCode,
+                    Country = model.GetType().GetProperty("Country")?.GetValue(model, null)?.ToString() ?? "USA", //default to USA if not provided
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = DateTime.UtcNow
+
+                };
+                _context.UserAddresses.Add(userAddress);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("New address added for UserId={UserId}", userId);
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error adding address for UserId={UserId}", userId);
+                return false;
+            }   
         }
 
         public  async Task<bool> ChangePasswordAsync(int userId, ChangePasswordViewModel model)
@@ -220,9 +246,26 @@ namespace FoodDeliveryApp.Services
             }
         }
 
-        public Task<bool> DeleteAddressAsync(int addressId)
+        public async Task<bool> DeleteAddressAsync(int addressId)
         {
-            throw new NotImplementedException();
+            try
+            { 
+                var address =  _context.UserAddresses.FirstOrDefault(ua => ua.UserAddressId == addressId);
+                if (address == null)
+                {
+                    _logger.LogWarning("Delete address failed. Address not found: AddressId={AddressId}", addressId);
+                    return false;
+                }
+                _context.UserAddresses.Remove(address);
+                 _context.SaveChanges();
+                _logger.LogInformation("Address deleted successfully: AddressId={AddressId}", addressId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting address for AddressId={AddressId}", addressId);
+                return false;
+            }
         }
 
         public async Task<bool> ForgotPasswordAsync(ForgotPasswordViewModel model)
@@ -247,14 +290,38 @@ namespace FoodDeliveryApp.Services
             }
         }
 
-        public Task<List<UserAddress>> GetAddressesAsync(int userId)
+        public async Task<List<UserAddress>> GetAddressesAsync(int userId)
         {
-            throw new NotImplementedException();
+            try
+            { 
+                var addresses = await _context.UserAddresses
+                            .AsNoTracking(). //optimize for read-only
+                             Where(ua => ua.UserId == userId).ToListAsync();
+                _logger.LogInformation("Retrieved {Count} addresses for UserId={UserId}", addresses.Count, userId);
+                return addresses;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving addresses for UserId={UserId}", userId);
+                return new List<UserAddress>();
+            }
         }
 
-        public Task<User?> GetCustomerByIdAsync(int userId)
+        public async Task<User?> GetCustomerByIdAsync(int userId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                //Retrieve the user based on userId and ensure they are a customer
+                var user = await _context.Users.AsNoTracking()
+                            .FirstOrDefaultAsync(u => u.UserId == userId && u.RoleMasterId == (int)RoleMasterModel.Customer && u.IsActive);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving customer for UserId={UserId}", userId);
+                return null;
+            }
         }
 
 
@@ -289,14 +356,68 @@ namespace FoodDeliveryApp.Services
             }
         }
 
-        public Task<bool> UpdateAddressAsync(int userId, EditAddressViewModel model)
+        public async Task<bool> UpdateAddressAsync(int userId, EditAddressViewModel model)
         {
-            throw new NotImplementedException();
+            try
+            { 
+                //First Validate the address belongs to the user or not
+                var existingAddress = await _context.UserAddresses.FirstOrDefaultAsync(ua => ua.UserAddressId == model.UserAddressId && ua.UserId == userId);
+                if (existingAddress == null)
+                {
+                    _logger.LogWarning("Update address failed. Address not found or does not belong to user: UserId={UserId}, AddressId={AddressId}", userId, model.UserAddressId);
+                    return false;
+                }
+                else
+                {
+                    //Map the updated fields from the view model to the entity
+                    existingAddress.AddressLine1 = model.AddressLine1;
+                    existingAddress.AddressLine2 = model.AddressLine2;
+                    existingAddress.City = model.City;
+                    existingAddress.State = model.State;
+                    existingAddress.ZipCode = model.ZipCode;
+                    existingAddress.Country = model.GetType().GetProperty("Country")?.GetValue(model, null)?.ToString() ?? existingAddress.Country; //retain existing country if not provided
+                    existingAddress.ModifiedDate = DateTime.UtcNow;
+                    
+                }
+                
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Address updated successfully for UserId={UserId}, AddressId={AddressId}", userId, model.UserAddressId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating address for UserId={UserId}, AddressId={AddressId}", userId, model.UserAddressId);
+                return false;
+            }
         }
 
-        public Task<bool> UpdateCustomerAccountAsync(AccountViewModel model)
+        public async Task<bool> UpdateCustomerAccountAsync(AccountViewModel model)
         {
-            throw new NotImplementedException();
-        }
+            try 
+            {
+                //Retrieve the customer from the database 
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == model.UserId && u.RoleMasterId == (int)RoleMasterModel.Customer && u.IsActive);
+                if (user == null)
+                {
+                    _logger.LogWarning("Update account failed. User not found: UserId={UserId}", model.UserId);
+                    return false;
+                }
+                //Update the user fields
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.PhoneNumber = model.PhoneNumber;
+                user.ModifiedDate = DateTime.UtcNow;
+
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Customer account updated successfully for UserId={UserId}", model.UserId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating customer account for UserId={UserId}", model.UserId);
+                return false;
+            }
     }
 }
